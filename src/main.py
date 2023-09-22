@@ -23,4 +23,4 @@ def predict(message, history):
             partial_message = partial_message + chunk['choices'][0]['delta']['content']
             yield partial_message
 
-gr.ChatInterface(predict, title="Assitant backed by GPT").queue().launch()
+gr.ChatInterface(predict, title="Assitant backed by GPT").queue().launch(share=True)
