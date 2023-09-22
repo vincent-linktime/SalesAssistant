@@ -1,3 +1,4 @@
+deeplake==3.6.26
+gradio==3.44.0
+langchain==0.0.299
 openai==0.28.0
-gradio==3.42.0
-python-arango==7.6.2
