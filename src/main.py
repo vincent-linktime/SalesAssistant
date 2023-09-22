@@ -1,21 +1,12 @@
 import openai, os
 import gradio as gr
+from chat_utils import ChatGPT
 
-openai.api_key = os.environ["OPENAI_KEY"]
+
+chat = ChatGPT(need_db=True)
 
 def predict(message, history):
-    history_openai_format = []
-    for human, assistant in history:
-        history_openai_format.append({"role": "user", "content": human })
-        history_openai_format.append({"role": "assistant", "content":assistant})
-    history_openai_format.append({"role": "user", "content": message})
-
-    response = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
-        messages= history_openai_format,
-        temperature=1.0,
-        stream=True
-    )
+    response = chat.generate_response_for_objections(message)
 
     partial_message = ""
     for chunk in response:
