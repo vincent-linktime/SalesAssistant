@@ -9,6 +9,6 @@ args = parser.parse_args()
 chat = ChatGPT(args.guidelines_file_path)
 
 def predict(message, history):
-    yield chat.generate_response_for_objections(message)
+    yield chat.generate_response(message)
 
 gr.ChatInterface(predict, title="Assitant backed by GPT").queue().launch(share=True)

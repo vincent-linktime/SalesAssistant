@@ -8,8 +8,7 @@ import prompts
 
 class ChatGPT:
     """
-    A class for interacting with an AI chat model, querying transcripts, finding objections in transcripts
-    and generating responses from sales calls.
+    A class for interacting with an AI chat model.
     """
 
     def __init__(self, guideline_filepath=None):
@@ -30,7 +29,7 @@ class ChatGPT:
 
         self.ai_message = None
 
-    def generate_response(self, question):
+    def generate_response_for_general_questions(self, question):
         """
         Sends a message to the chatbot, and returns the response.
 
@@ -52,38 +51,37 @@ class ChatGPT:
         return str(response.content)
 
 
-    def find_objections(self, question):
+    def find_objections_or_acceptances(self, question):
         """
-        Detects whether there is an objection in a transcript, and returns the objection if there is one.
+        Detects whether there is an objection or acceptance.
 
         Parameters:
-            transcript (str): The transcript to search for an objection in.
+            question (str): The customer inquiry.
 
         Returns:
-            str: The objection found in the transcript, or None if no objection was found.
+            str: The question, or None if no objection/acceptance was found.
 
         """
         human_message = HumanMessage(content=question)
-        sys_message = SystemMessage(content=prompts.DETECT_OBJECTION_PROMPT)
+        sys_message = SystemMessage(content=prompts.DETECT_ACCEPTANCE_OR_OBJECTION_PROMPT)
         response = self.chat([sys_message, human_message])
         return response.content
 
-    def generate_response_for_objections(self, question):
+    def generate_response(self, question):
         """
-        Generates a response from a sales call transcript if there is an objection. Queries a Deep Lake DB for relevant guidelines.
-
+        Generates a response from a customer inquiry
         Parameters:
-            transcript (str): The transcript to generate a response from.
+            question (str): The question to generate a response from.
 
         Returns:
-            str: The response generated from the transcript, or None if no objection was found.
+            str: The response generated from the inquiry.
         """
-        response = self.find_objections(question)
+        response = self.find_objections_or_acceptances(question)
         if response[:2].translate(str.maketrans('', '', string.punctuation)).lower() == 'no':
-            return self.generate_response(question)
+            return self.generate_response_for_general_questions(question)
         else:
             results = self.db.query_db(response)
-            sys_message = SystemMessage(content=prompts.OBJECTION_GUIDELINES_PROMPT)
+            sys_message = SystemMessage(content=prompts.GUIDELINES_PROMPT)
             human_message = HumanMessage(content=f'Customer objection: {response}, ||| Relevant guidelines: {results} ||| Question: {question}')
             response = self.chat([sys_message, human_message])
             self.ai_message = AIMessage(content=str(response.content))
