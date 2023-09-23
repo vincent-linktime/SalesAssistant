@@ -1,4 +1,4 @@
-import string
+import string, os
 
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
@@ -12,7 +12,7 @@ class ChatGPT:
     and generating responses from sales calls.
     """
 
-    def __init__(self, need_db=False):
+    def __init__(self, guideline_filepath=None):
         """
         Initializes a ChatGPT instance.
 
@@ -20,9 +20,12 @@ class ChatGPT:
         self.messages = []
         self.chat = ChatOpenAI(model_name="gpt-3.5-turbo")
 
-        if need_db:
-            self.db = VectorDB('data/guidelines.json')
-
+        if guideline_filepath is not None and os.path.exists(guideline_filepath):
+            self.db = VectorDB(guideline_filepath)
+        else:
+            print("The guidelines file path does not exist or is not defined!")
+            raise ValueError
+            
         self.messages.append(SystemMessage(content=prompts.LIVE_CHAT_PROMPT))
 
         self.ai_message = None

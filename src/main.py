@@ -1,9 +1,12 @@
-import openai, os
+import argparse, openai, os
 import gradio as gr
 from chat_utils import ChatGPT
 
+parser = argparse.ArgumentParser()
+parser.add_argument("guidelines_file_path", help="JSON file path for guidelines")
+args = parser.parse_args()
 
-chat = ChatGPT(need_db=True)
+chat = ChatGPT(args.guidelines_file_path)
 
 def predict(message, history):
     yield chat.generate_response_for_objections(message)
