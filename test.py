@@ -1,15 +1,9 @@
+from langchain.document_loaders import JSONLoader
 
-import openai, os
+loader = JSONLoader(
+    file_path='./data/guidelines.json',
+    jq_schema='.guidelines[].content',
+    text_content=False)
 
-openai.api_key = os.environ["OPENAI_KEY"]
-os.environ["http_proxy"]="127.0.0.1:8118"
-os.environ["https_proxy"]="127.0.0.1:8118"
+data = loader.load()
 
-response = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo",
-    messages=[
-        {"role": "assistant", "content": "This is a test!"}
-    ]
-)
-
-print(response)

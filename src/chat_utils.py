@@ -2,9 +2,7 @@ import string
 
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
-
-from deep_lake_utils import DeepLakeLoader
-
+from vectordb import VectorDB
 import prompts
 
 
@@ -21,10 +19,9 @@ class ChatGPT:
         """
         self.messages = []
         self.chat = ChatOpenAI(model_name="gpt-3.5-turbo")
-        self.response = ""
 
         if need_db:
-            self.db = DeepLakeLoader('data/guidelines.txt')
+            self.db = VectorDB('data/guidelines.json')
 
         self.messages.append(SystemMessage(content=prompts.LIVE_CHAT_PROMPT))
 
@@ -44,12 +41,12 @@ class ChatGPT:
         human_message = HumanMessage(content=f'question: {question}')
         temp_messages = self.messages.copy()
         temp_messages.append(human_message)
-        self.response = self.chat(temp_messages)
+        response = self.chat(temp_messages)
         self.messages.append(human_message)
-        ai_message = AIMessage(content=self.response.content)
+        ai_message = AIMessage(content=response.content)
         self.messages.append(ai_message)
 
-        return str(ai_message.content)
+        return str(response.content)
 
 
     def find_objections(self, question):
