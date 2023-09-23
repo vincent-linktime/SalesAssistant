@@ -10,6 +10,7 @@ vectordb
 
 # Distribution / packaging
 .Python
+.DS_Store
 build/
 develop-eggs/
 dist/
