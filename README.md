@@ -26,3 +26,13 @@ Now let's initiate the chatbot by running main.py.
 ```
 python src/main.py example/guidelines.json
 ```
+
+### Example inputs for the chatbot
+```
+1. The cost of your product seems very high.
+2. We don't have any budget left in this year.
+3. Your product is too complicated than the one we have now.
+4. What are the main features of your product?
+5. What makes your product different from others in the market?
+6. What kind of service will be available after purchasing?
+```
