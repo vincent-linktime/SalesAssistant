@@ -11,4 +11,4 @@ chat = ChatGPT(args.guidelines_file_path)
 def predict(message, history):
     yield chat.generate_response(message)
 
-gr.ChatInterface(predict, title="Assitant backed by GPT").queue().launch(share=True)
+gr.ChatInterface(predict, title="Sales Assitant backed by GPT").queue().launch(share=True)
