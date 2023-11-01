@@ -1,10 +1,16 @@
 import string, os
 
+from langchain.agents import AgentType, initialize_agent, Tool
 from langchain.chat_models import ChatOpenAI
+from langchain.globals import set_debug
+from langchain.memory import ConversationBufferMemory
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from vectordb import VectorDB
+from graphdb import GraphDB
 import prompts
 
+set_debug(True)
+MODEL_NAME = "gpt-3.5-turbo"
 
 class ChatGPT:
     """
@@ -17,7 +23,7 @@ class ChatGPT:
 
         """
         self.messages = []
-        self.chat = ChatOpenAI(model_name="gpt-3.5-turbo")
+        self.chat = ChatOpenAI(temperature=0, model_name=MODEL_NAME)
 
         if guideline_filepath is not None and os.path.exists(guideline_filepath):
             self.db = VectorDB(guideline_filepath)
@@ -26,8 +32,43 @@ class ChatGPT:
             raise ValueError
             
         self.messages.append(SystemMessage(content=prompts.LIVE_CHAT_PROMPT))
-
         self.ai_message = None
+
+        graph_db = GraphDB()
+        self.cypher_chain = graph_db.get_cypher_chain()
+
+        self.init_agents()
+
+    def init_agents(self):
+        tools = [
+            Tool(
+                name="Vector",
+                func=self.query_vector,
+                description="""Use this tool whenever the input is not related to any detail of our products.
+                Use full question as input.
+                """,
+            ),
+            Tool(
+                name="Graph",
+                func=self.query_graph,
+                description="""Useful when you need to answer questions about the detail of KDP product,
+                and its components, features, or related technologies. Also useful for any sort of 
+                aggregation like counting the number of components, etc.
+                Use full question as input.
+                """,
+            ),
+        ]
+
+        self.memory = ConversationBufferMemory(memory_key="memory", return_messages=True)
+        self.mrkl = initialize_agent(
+            tools, 
+            self.chat,
+            agent=AgentType.OPENAI_FUNCTIONS, 
+            memory=self.memory,
+            verbose=True,
+            max_iterations=2,
+            early_stopping_method="generate",
+        )        
 
     def generate_response_for_general_questions(self, question):
         """
@@ -67,7 +108,7 @@ class ChatGPT:
         response = self.chat([sys_message, human_message])
         return response.content
 
-    def generate_response(self, question):
+    def query_vector(self, question):
         """
         Generates a response from a customer inquiry
         Parameters:
@@ -86,3 +127,9 @@ class ChatGPT:
             response = self.chat([sys_message, human_message])
             self.ai_message = AIMessage(content=str(response.content))
             return response.content
+
+    def query_graph(self, question):
+        return self.cypher_chain.run(question)
+
+    def query(self, question):
+        return self.mrkl.run(question)
