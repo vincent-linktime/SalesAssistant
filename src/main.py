@@ -1,10 +1,9 @@
-import argparse, openai, os
 import gradio as gr
-from chat_utils import ChatGPT
+from agent import SalesAgentExecutor
 
-chat = ChatGPT()
+agent_executor = SalesAgentExecutor().get_agent_executor()
 
 def predict(message, history):
-    yield chat.query(message)
+    yield agent_executor.run(message)
 
 gr.ChatInterface(predict, title="Sales Assistant backed by GPT").queue().launch(share=True)
