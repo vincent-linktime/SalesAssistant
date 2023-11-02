@@ -1,6 +1,6 @@
 from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
 from langchain.prompts import StringPromptTemplate
-from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.chains import LLMChain
 from typing import List, Union
@@ -88,9 +88,8 @@ class SalesAgentExecutor():
         )   
     
         output_parser = SalesOutputParser()
-        llm = OpenAI(temperature=0, model_name=MODEL_NAME)
+        llm = ChatOpenAI(temperature=0, model_name=MODEL_NAME)
         llm_chain = LLMChain(llm=llm, prompt=prompt_with_history)
-        tool_names = [tool.name for tool in tools]
         tool_names = [tool.name for tool in tools]
         memory=ConversationBufferWindowMemory(k=2)
         agent = LLMSingleActionAgent(
