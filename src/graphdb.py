@@ -16,7 +16,7 @@ class GraphDB:
         self.graph.refresh_schema()
 
         self.cypher_chain = GraphCypherQAChain.from_llm(
-           cypher_llm = ChatOpenAI(temperature=0, model_name='gpt-4'),
+           cypher_llm = ChatOpenAI(temperature=0, model_name=MODEL_NAME),
            qa_llm = ChatOpenAI(temperature=0), graph=self.graph, verbose=True
         )
 

@@ -17,40 +17,34 @@ class ChatGPT:
     A class for interacting with an AI chat model.
     """
 
-    def __init__(self, guideline_filepath=None):
+    def __init__(self):
         """
         Initializes a ChatGPT instance.
 
         """
-        self.messages = []
-        self.chat = ChatOpenAI(temperature=0, model_name=MODEL_NAME)
-
-        if guideline_filepath is not None and os.path.exists(guideline_filepath):
-            self.db = VectorDB(guideline_filepath)
-        else:
-            print("The guidelines file path does not exist or is not defined!")
-            raise ValueError
-            
+        self.messages = [] 
         self.messages.append(SystemMessage(content=prompts.LIVE_CHAT_PROMPT))
         self.ai_message = None
 
         graph_db = GraphDB()
+        vector_db = VectorDB()
         self.cypher_chain = graph_db.get_cypher_chain()
-
+        self.vector_chain = vector_db.get_vector_chain()
         self.init_agents()
 
     def init_agents(self):
         tools = [
             Tool(
                 name="Vector",
-                func=self.query_vector,
-                description="""Use this tool whenever the input is not related to any detail of our products.
+                func=self.vector_chain.run,
+                description="""Useful when you need to answer the general questions.
+                Not useful for answering questions about the detail of KDP product.
                 Use full question as input.
                 """,
             ),
             Tool(
                 name="Graph",
-                func=self.query_graph,
+                func=self.cypher_chain.run,
                 description="""Useful when you need to answer questions about the detail of KDP product,
                 and its components, features, or related technologies. Also useful for any sort of 
                 aggregation like counting the number of components, etc.
@@ -62,7 +56,7 @@ class ChatGPT:
         self.memory = ConversationBufferMemory(memory_key="memory", return_messages=True)
         self.mrkl = initialize_agent(
             tools, 
-            self.chat,
+            ChatOpenAI(temperature=0, model_name=MODEL_NAME),
             agent=AgentType.OPENAI_FUNCTIONS, 
             memory=self.memory,
             verbose=True,
@@ -127,9 +121,6 @@ class ChatGPT:
             response = self.chat([sys_message, human_message])
             self.ai_message = AIMessage(content=str(response.content))
             return response.content
-
-    def query_graph(self, question):
-        return self.cypher_chain.run(question)
 
     def query(self, question):
         return self.mrkl.run(question)
