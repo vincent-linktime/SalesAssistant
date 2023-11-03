@@ -53,5 +53,7 @@ python src/main.py
 ### Demo Results
 For general questions from the customer, the chatbot searches the vector store to retrieve the answer.<p>
 ![general customer inquiry](../assets/general-inquiry.png?raw=true)<p>
+![answer general inquiry](../assets/answer-general-inquiry.png?raw=true)<p>
 When the customer requests specific product details, the chatbot searches the knowledge graph to provide the answer.<p>
 ![product-specific customer inquiry](../assets/product-inquiry.png?raw=true)
+![answer product-specific inquiry](../assets/answer-product-inquiry.png?raw=true)
