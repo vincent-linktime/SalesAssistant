@@ -18,7 +18,7 @@ Begin! Remember to speak as a sales person when giving your final answer.
 
 If the input question from customer is showing any interests to the product or service 
 we are selling, or whether the customer is raising any objections, or some general 
-non-techinical questions about the KDP product (no technical detail). The action to take
+non-techinical questions about our product (no technical detail). The action to take
 should be "Vector Search", and the input to the action is the question. 
 
 General questions sound like:
@@ -42,7 +42,7 @@ We're already working with another vendor.
 I'm locked into a contract with a competitor.
 I can get a cheaper version somewhere else.'''
 
-If the input question from customer is about the technical detail of KDP product,
+If the input question from customer is about the technical detail of our product,
 and its components, features, or related technologies, or any sort of 
 aggregation like counting the number of components, etc. The action to take
 shoule bd "Graph Search", and the input to the action is the question.
